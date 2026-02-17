@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero-section" style="background: linear-gradient(135deg, #2c3e50 0%, #4a569d 100%); padding: 60px 0; text-align: center; color: white;">
+    <div class="container">
+        <h1 style="font-size: 2.5em; margin-bottom: 15px;">👥 الفرق المشاركة</h1>
+        <h2 style="font-size: 1.5em; margin-bottom: 20px; opacity: 0.9;">Ramadan Coding Teams 2026</h2>
+        <p style="font-size: 1.1em; max-width: 700px; margin: 0 auto 30px;">
+            استعرض الفرق المشاركة في المسابقة وشاهد مشاريعهم المتميزة
+        </p>
+        
+        <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+            {% if session.first_name %}
+                {% if not session.team_id %}
+                <a href="{{ url_for('members.create_team_route') }}" class="cta-button" style="background: #f39c12; padding: 15px 30px; border-radius: 50px; color: white; text-decoration: none; font-weight: 600;">
+                    <i class="fas fa-plus-circle"></i> إنشاء فريق جديد
+                </a>
+                {% else %}
+                <a href="{{ url_for('members.my_team') }}" class="cta-button" style="background: #27ae60; padding: 15px 30px; border-radius: 50px; color: white; text-decoration: none; font-weight: 600;">
+                    <i class="fas fa-users"></i> فريقي
+                </a>
+                {% endif %}
+            {% else %}
+            <a href="{{ url_for('quiz.quiz') }}" class="cta-button" style="background: #f39c12; padding: 15px 30px; border-radius: 50px; color: white; text-decoration: none; font-weight: 600;">
+                <i class="fas fa-sign-in-alt"></i> سجل للمشاركة
+            </a>
+            {% endif %}
+        </div>
+        
+        <div style="max-width: 500px; margin: 30px auto 0;">
+            <form method="GET" style="display: flex; gap: 10px;">
+                <input type="text" name="search" placeholder="ابحث عن فريق..." value="{{ search }}" 
+                       style="flex: 1; padding: 15px; border: none; border-radius: 50px; font-size: 16px;">
+                <button type="submit" style="padding: 15px 30px; background: #f39c12; border: none; border-radius: 50px; color: white; font-weight: 600; cursor: pointer;">
+                    <i class="fas fa-search"></i> بحث
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<section style="padding: 60px 0;">
+    <div class="container">
+        {% if teams %}
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 30px;">
+            {% for team in teams %}
+            <div style="background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); transition: transform 0.3s; hover:transform: translateY(-10px);">
+                <div style="background: linear-gradient(135deg, #4a569d, #2c3e50); color: white; padding: 30px; text-align: center;">
+                    <div style="width: 80px; height: 80px; background: #f39c12; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                        <i class="fas fa-users fa-3x" style="color: white;"></i>
+                    </div>
+                    <h3 style="margin: 0 0 5px; font-size: 1.8em;">{{ team.team_name }}</h3>
+                    <p style="opacity: 0.9; margin: 0;">{{ team.project_title }}</p>
+                </div>
+                
+                <div style="padding: 25px;">
+                    <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">{{ team.description[:100] }}...</p>
+                    
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 20px; padding: 15px 0; border-top: 1px solid #eee; border-bottom: 1px solid #eee;">
+                        <div style="text-align: center;">
+                            <span style="display: block; font-size: 1.3em; font-weight: bold; color: #4a569d;">{{ team.total_points }}</span>
+                            <span style="color: #666; font-size: 0.9em;">نقطة</span>
+                        </div>
+                        <div style="text-align: center;">
+                            <span style="display: block; font-size: 1.3em; font-weight: bold; color: #4a569d;">{{ team.members_count }}</span>
+                            <span style="color: #666; font-size: 0.9em;">أعضاء</span>
+                        </div>
+                        <div style="text-align: center;">
+                            <span style="display: block; font-size: 1.3em; font-weight: bold; color: #4a569d;">{{ team.total_attempts or 0 }}</span>
+                            <span style="color: #666; font-size: 0.9em;">تحديات</span>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <span style="font-weight: 600; color: #2c3e50;">قائد الفريق:</span>
+                        <span style="color: #666;">{{ team.leader_first_name }} {{ team.leader_last_name }}</span>
+                    </div>
+                    
+                    <a href="{{ url_for('members.team_detail', team_id=team.id) }}" 
+                       style="display: block; background: #4a569d; color: white; text-align: center; padding: 15px; border-radius: 10px; text-decoration: none; font-weight: 600; transition: all 0.3s;">
+                        عرض التفاصيل <i class="fas fa-arrow-left"></i>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 60px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+            <i class="fas fa-users-slash fa-4x" style="color: #4a569d; margin-bottom: 20px;"></i>
+            <h3 style="color: #2c3e50; margin-bottom: 10px;">لا توجد فرق</h3>
+            <p style="color: #666;">
+                {% if search %}
+                    لا توجد فرق تطابق بحث "{{ search }}"
+                {% else %}
+                    كن أول من ينشئ فريقاً في المسابقة
+                {% endif %}
+            </p>
+            {% if session.first_name and not session.team_id %}
+            <a href="{{ url_for('members.create_team_route') }}" style="display: inline-block; margin-top: 20px; background: #f39c12; color: white; padding: 15px 30px; border-radius: 10px; text-decoration: none; font-weight: 600;">
+                <i class="fas fa-plus-circle"></i> إنشاء فريق
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

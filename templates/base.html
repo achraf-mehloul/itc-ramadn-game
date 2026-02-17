@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مسابقة رمضان البرمجية 2026</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header style="background: linear-gradient(135deg, #2c3e50 0%, #4a569d 100%); color: white; padding: 20px 0;">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+            <div class="logo-section" style="display: flex; align-items: center; gap: 15px;">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="رمضان كريم" style="height: 60px; width: auto;" onerror="this.style.display='none'">
+                <div>
+                    <h1 style="margin: 0; font-size: 1.5em;">🌙 مسابقة رمضان البرمجية</h1>
+                    <h2 style="margin: 5px 0 0; font-size: 1em; opacity: 0.9;">Ramadan Coding Challenge 2026</h2>
+                </div>
+            </div>
+            <nav>
+                <ul style="display: flex; list-style: none; margin: 0; padding: 0; gap: 20px;">
+                    <li><a href="{{ url_for('quiz.index') }}" style="color: white; text-decoration: none;">الرئيسية</a></li>
+                    <li><a href="{{ url_for('members.teams_list') }}" style="color: white; text-decoration: none;">الفرق</a></li>
+                    <li><a href="{{ url_for('quiz.quiz') }}" style="color: white; text-decoration: none;">التحدي</a></li>
+                    <li><a href="{{ url_for('quiz.leaderboard') }}" style="color: white; text-decoration: none;">المتصدرين</a></li>
+                    <li><a href="{{ url_for('poetry.poetry_competition') }}" style="color: white; text-decoration: none;">التصويت</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer style="background: #2c3e50; color: white; padding: 30px 0; margin-top: 50px;">
+        <div class="container" style="text-align: center;">
+            <p style="margin: 0 0 10px;">&copy; رمضان 1447 / 2026 – مسابقة البرمجة الرمضانية</p>
+            <div style="display: flex; justify-content: center; gap: 15px;">
+                <div style="width: 30px; height: 30px; background: #f39c12; border-radius: 50%;"></div>
+                <div style="width: 30px; height: 30px; background: #4a569d; border-radius: 50%;"></div>
+                <div style="width: 30px; height: 30px; background: #27ae60; border-radius: 50%;"></div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

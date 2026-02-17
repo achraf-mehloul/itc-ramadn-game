@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero-section" style="background: linear-gradient(135deg, #2c3e50 0%, #4a569d 100%);">
+    <div class="container">
+        <div class="hero-content">
+            <h1>🌙 مسابقة رمضان البرمجية 2026</h1>
+            <h2>رمضان فرصة للتحدي والإبداع</h2>
+            <p class="hero-description">
+                شارك في أكبر مسابقة برمجية عربية خلال شهر رمضان المبارك<br>
+                تحدى نفسك، تعلم مهارات جديدة، واربح جوائز قيمة
+            </p>
+            <a href="{{ url_for('quiz.quiz') }}" class="cta-button">ابدأ التحدي الآن</a>
+        </div>
+    </div>
+</div>
+
+<section class="info-section">
+    <div class="container">
+        <div class="section-title">
+            <h2>✨ مميزات المسابقة</h2>
+        </div>
+        
+        <div class="info-grid">
+            <div class="info-card">
+                <div class="card-icon">🌙</div>
+                <h3>تحدي يومي</h3>
+                <p>سؤال برمجي جديد كل يوم طوال شهر رمضان، مستويات متنوعة تناسب الجميع</p>
+            </div>
+            
+            <div class="info-card">
+                <div class="card-icon">🏆</div>
+                <h3>جوائز قيمة</h3>
+                <p>جوائز لأفضل المبرمجين في نهاية الشهر + جوائز يومية للمتميزين</p>
+            </div>
+            
+            <div class="info-card">
+                <div class="card-icon">👥</div>
+                <h3>مسابقات فرق</h3>
+                <p>شارك مع فريقك في مسابقة الكود الجماعي وتنافس مع الفرق الأخرى</p>
+            </div>
+            
+            <div class="info-card">
+                <div class="card-icon">💡</div>
+                <h3>تحديات أسبوعية</h3>
+                <p>كل أسبوع تحدي خاص بمجال معين: ويب، أمن سيبراني، ذكاء اصطناعي</p>
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <h2>إحصائيات المسابقة</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number">1000+</span>
+                    <span class="stat-label">مشارك</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">30</span>
+                    <span class="stat-label">تحدي يومي</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">50+</span>
+                    <span class="stat-label">فريق</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">10</span>
+                    <span class="stat-label">جوائز</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="how-to-participate">
+            <h2>📋 كيفية المشاركة</h2>
+            <div class="steps-grid">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <h4>سجل دخولك</h4>
+                    <p>أدخل اسمك واسم فريقك (اختياري) للبدء</p>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <h4>اختر التحدي</h4>
+                    <p>اختر المستوى المناسب: مبتدئ، متوسط، متقدم</p>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <h4>حل الأسئلة</h4>
+                    <p>أجب على الأسئلة بشكل صحيح وفي أسرع وقت</p>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <h4>احصل على نقاط</h4>
+                    <p>كل إجابة صحيحة تمنحك نقاطاً لترتفع في الترتيب</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="quote-section">
+            <blockquote>
+                "خيركم من تعلم القرآن وعلمه، وخيركم من تعلم البرمجة وشارك علمه"
+                <br>
+                <cite>شعار المسابقة</cite>
+            </blockquote>
+        </div>
+    </div>
+</section>
+
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, #2c3e50 0%, #4a569d 100%);
+        color: white;
+        padding: 80px 0;
+        text-align: center;
+    }
+    
+    .section-title {
+        text-align: center;
+        margin: 50px 0 30px;
+    }
+    
+    .section-title h2 {
+        font-size: 2.2em;
+        color: #2c3e50;
+        position: relative;
+        display: inline-block;
+        padding-bottom: 10px;
+    }
+    
+    .section-title h2:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 25%;
+        width: 50%;
+        height: 3px;
+        background: linear-gradient(90deg, #f39c12, #e74c3c);
+    }
+    
+    .card-icon {
+        font-size: 3em;
+        margin-bottom: 15px;
+    }
+    
+    .stats-section {
+        background: #f8f9fa;
+        padding: 40px;
+        border-radius: 20px;
+        margin: 40px 0;
+        text-align: center;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 20px;
+        margin-top: 30px;
+    }
+    
+    .stat-number {
+        font-size: 2.5em;
+        font-weight: bold;
+        color: #4a569d;
+        display: block;
+    }
+    
+    .stat-label {
+        font-size: 1.2em;
+        color: #666;
+    }
+    
+    .how-to-participate {
+        margin: 50px 0;
+    }
+    
+    .steps-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-top: 30px;
+    }
+    
+    .step-item {
+        text-align: center;
+        padding: 20px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        position: relative;
+    }
+    
+    .step-number {
+        width: 40px;
+        height: 40px;
+        background: #4a569d;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2em;
+        font-weight: bold;
+        margin: 0 auto 15px;
+    }
+</style>
+{% endblock %}

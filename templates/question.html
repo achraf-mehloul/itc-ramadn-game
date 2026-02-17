@@ -1,0 +1,343 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="question-section">
+    <div class="container">
+        <div class="quiz-progress">
+            <div class="progress-bar">
+                <div class="progress" style="width: {{ (question_number / total_questions * 100) }}%"></div>
+            </div>
+            <p>السؤال {{ question_number }} من {{ total_questions }}</p>
+        </div>
+        
+        <form method="POST" class="question-form" id="questionForm">
+            <input type="hidden" id="timeTaken" name="time_taken" value="0">
+            
+            <div class="question-timer">
+                <div class="timer-info">
+                    <span class="timer-label">⏱️ الوقت المتبقي:</span>
+                    <div class="timer-circle">
+                        <svg class="timer-svg" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="45" class="timer-bg"></circle>
+                            <circle cx="50" cy="50" r="45" class="timer-progress"></circle>
+                        </svg>
+                        <span class="timer-text">15s</span>
+                    </div>
+                </div>
+                <div class="time-bonus">⚡ أجب بسرعة للحصول على نقاط إضافية</div>
+            </div>
+            
+            <div class="question-card">
+                <h2 class="question-text">{{ question.question }}</h2>
+                
+                <div class="options-grid">
+                    {% for option in question.options %}
+                    <label class="option-label">
+                        <input type="radio" name="answer" value="{{ option }}" required>
+                        <span class="option-text">{{ option }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+                
+                <button type="submit" class="next-question-btn">
+                    {% if question_number == total_questions %}
+                    إنهاء التحدي
+                    {% else %}
+                    السؤال التالي
+                    {% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+class QuizTimer {
+    constructor() {
+        this.totalTime = 15;   
+        this.timeLeft = 15;
+        this.timerInterval = null;
+        this.timerElement = document.querySelector('.timer-text');
+        this.progressCircle = document.querySelector('.timer-progress');
+        this.timeTakenInput = document.getElementById('timeTaken');
+        this.questionForm = document.getElementById('questionForm');
+        this.init();
+    }
+
+    init() {
+        if (!this.timerElement || !this.progressCircle) {
+            console.error('Timer elements not found');
+            return;
+        }
+        
+        const circumference = 283;
+        this.progressCircle.style.strokeDasharray = circumference;
+        this.progressCircle.style.strokeDashoffset = 0;
+        
+        this.startTimer();
+        this.setupEventListeners();
+    }
+
+    startTimer() {
+        this.clearTimer();
+        
+        this.timerInterval = setInterval(() => {
+            this.timeLeft--;
+            
+            this.updateTimerDisplay();
+            this.updateProgressCircle();
+            this.updateTimeTaken();
+            
+            if (this.timeLeft <= 0) {
+                this.handleTimeUp();
+            }
+        }, 1000);
+    }
+
+    updateTimerDisplay() {
+        if (this.timerElement) {
+            this.timerElement.textContent = this.timeLeft + 's';
+        }
+    }
+
+    updateProgressCircle() {
+        if (this.progressCircle) {
+            const circumference = 283;
+            const progress = this.timeLeft / this.totalTime;
+            const offset = circumference * (1 - progress);
+            this.progressCircle.style.strokeDashoffset = offset;
+            this.updateTimerColor();
+        }
+    }
+
+    updateTimerColor() {
+        if (!this.progressCircle || !this.timerElement) return;
+
+        this.progressCircle.classList.remove('warning', 'danger');
+        this.timerElement.classList.remove('warning', 'danger');
+
+        if (this.timeLeft <= 4) {
+            this.progressCircle.classList.add('danger');
+            this.timerElement.classList.add('danger');
+        } 
+        else if (this.timeLeft <= 8) {
+            this.progressCircle.classList.add('warning');
+            this.timerElement.classList.add('warning');
+        }
+    }
+
+    updateTimeTaken() {
+        if (this.timeTakenInput) {
+            this.timeTakenInput.value = this.totalTime - this.timeLeft;
+        }
+    }
+
+    handleTimeUp() {
+        this.clearTimer();
+        
+        const selectedAnswer = document.querySelector('input[name="answer"]:checked');
+        if (!selectedAnswer) {
+            const firstOption = document.querySelector('input[name="answer"]');
+            if (firstOption) {
+                firstOption.checked = false;
+            }
+        }
+        
+        if (this.questionForm) {
+            setTimeout(() => {
+                this.questionForm.submit();
+            }, 500);
+        }
+    }
+
+    clearTimer() {
+        if (this.timerInterval) {
+            clearInterval(this.timerInterval);
+            this.timerInterval = null;
+        }
+    }
+
+    setupEventListeners() {
+        if (this.questionForm) {
+            this.questionForm.addEventListener('submit', () => {
+                this.clearTimer();
+                this.updateTimeTaken();
+            });
+        }
+        
+        window.addEventListener('beforeunload', () => {
+            this.clearTimer();
+        });
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const questionForm = document.getElementById('questionForm');
+    if (questionForm) {
+        window.quizTimer = new QuizTimer();
+    }
+});
+</script>
+
+<style>
+.question-timer {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.timer-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 15px;
+}
+
+.timer-label {
+    font-size: 1.2em;
+    font-weight: 600;
+    color: #4a569d;
+}
+
+.timer-circle {
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+
+.timer-svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.timer-bg {
+    fill: none;
+    stroke: #e9ecef;
+    stroke-width: 8;
+}
+
+.timer-progress {
+    fill: none;
+    stroke: #4a569d;
+    stroke-width: 8;
+    stroke-linecap: round;
+    transition: stroke 0.3s ease;
+}
+
+.timer-progress.warning {
+    stroke: #f39c12;
+}
+
+.timer-progress.danger {
+    stroke: #e74c3c;
+}
+
+.timer-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5em;
+    font-weight: 700;
+    color: #4a569d;
+    transition: color 0.3s ease;
+}
+
+.timer-text.warning {
+    color: #f39c12;
+}
+
+.timer-text.danger {
+    color: #e74c3c;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.1); }
+}
+
+.time-bonus {
+    text-align: center;
+    color: #666;
+    font-size: 0.95em;
+}
+
+.question-card {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.question-text {
+    color: #2c3e50;
+    margin-bottom: 30px;
+    font-size: 1.4em;
+    text-align: center;
+}
+
+.options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.option-label {
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.option-label input[type="radio"] {
+    display: none;
+}
+
+.option-text {
+    display: block;
+    padding: 15px;
+    background: #f8f9fa;
+    border: 2px solid #dee2e6;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 1.1em;
+    transition: all 0.3s;
+}
+
+.option-label input[type="radio"]:checked + .option-text {
+    background: #4a569d;
+    border-color: #4a569d;
+    color: white;
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(74,86,157,0.3);
+}
+
+.option-label:hover .option-text {
+    border-color: #4a569d;
+    transform: translateY(-2px);
+}
+
+.next-question-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #f39c12, #e74c3c);
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 1.2em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 5px 15px rgba(243,156,18,0.3);
+}
+
+.next-question-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(243,156,18,0.4);
+}
+</style>
+{% endblock %}

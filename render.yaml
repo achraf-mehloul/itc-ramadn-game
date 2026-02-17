@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: ramadan-coding
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn run:app
+    envVars:
+      - key: DATABASE_URL
+        value: postgresql://ramadan_qst_sl_user:yGnEizXLCsO47ecfU5TzPNQfLYBBUszV@dpg-d69t6bk9c44c738gpj1g-a.oregon-postgres.render.com/ramadan_qst_sl
+      - key: RENDER
+        value: true

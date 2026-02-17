@@ -1,0 +1,464 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="code-competition-container">
+    <div class="competition-header">
+        <h1>💻 مسابقة الكود الجماعي</h1>
+        <p class="competition-description">
+            شارك مع فريقك في تحدي البرمجة الجماعي
+            <br>
+            قدّم أفضل كود وانافس الفرق الأخرى
+        </p>
+    </div>
+
+    {% if error %}
+    <div class="error-message">
+        <p>⚠️ {{ error }}</p>
+        {% if user_name %}
+        <p class="user-info">المستخدم: {{ user_name }}</p>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="voting-form-section">
+        <div class="voter-info-card">
+            {% if ask_name %}
+            <h3>تسجيل الفريق</h3>
+            <p class="info-message">الرجاء إدخال معلومات الفريق للمشاركة</p>
+            <form method="POST" action="{{ url_for('poetry.save_user_info') }}">
+                <div class="form-group">
+                    <label for="first_name">اسم قائد الفريق:</label>
+                    <input type="text" id="first_name" name="first_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="last_name">لقب قائد الفريق:</label>
+                    <input type="text" id="last_name" name="last_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="team_name">اسم الفريق:</label>
+                    <input type="text" id="team_name" name="team_name" placeholder="مثال: CodeWizards" required>
+                </div>
+                <button type="submit" class="continue-button">متابعة</button>
+            </form>
+            {% else %}
+            <h3>صوت لأفضل كود</h3>
+            {% if user_name %}
+            <p class="welcome-message">مرحباً، {{ user_name }}! 👋</p>
+            {% endif %}
+            
+            <form method="POST" id="votingForm">
+                <div class="contestants-grid">
+                    {% for contestant in contestants %}
+                    <div class="contestant-card" data-contestant-id="{{ contestant.id }}">
+                        <div class="card-corner-decoration"></div>
+                        <div class="contestant-header">
+                            <div class="contestant-avatar">
+                                <div class="avatar-circle">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="contestant-badge">فريق</div>
+                            </div>
+                            <div class="contestant-info">
+                                <h3>{{ contestant.name }}</h3>
+                                <p class="contestant-class">{{ contestant.class }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="poem-preview">
+                            <div class="poem-icon">
+                                <i class="fas fa-code"></i>
+                            </div>
+                            <h4 class="poem-title">المشروع: {{ contestant.poem_title }}</h4>
+                            <div class="tech-stack">
+                                <span class="tech-badge">Python</span>
+                                <span class="tech-badge">Flask</span>
+                                <span class="tech-badge">SQLite</span>
+                            </div>
+                            <p class="poem-excerpt">{{ contestant.poem_excerpt }}</p>
+                        </div>
+                        
+                        <div class="code-preview">
+                            <pre><code>
+# نموذج من الكود
+def calculate_score(answers):
+    score = 0
+    for answer in answers:
+        if answer.is_correct:
+            score += 10
+    return score
+                            </code></pre>
+                        </div>
+                        
+                        <div class="vote-button-container">
+                            <button type="button" class="vote-button" onclick="selectContestant('{{ contestant.id }}')">
+                                <span class="vote-icon">
+                                    <i class="fas fa-vote-yea"></i>
+                                </span>
+                                <span class="vote-text">صوّت لهذا الفريق</span>
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <input type="hidden" id="contestant_id" name="contestant_id" required>
+                
+                <div class="submit-section" style="display: none;" id="submitSection">
+                    <div class="selection-confirmation">
+                        <i class="fas fa-check-circle"></i>
+                        <p class="selection-message">تم اختيار الفريق بنجاح</p>
+                    </div>
+                    <button type="submit" class="submit-vote-button">
+                        <i class="fas fa-paper-plane"></i>
+                        تأكيد التصويت
+                    </button>
+                </div>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="results-link">
+        <a href="{{ url_for('poetry.poetry_results') }}" class="view-results-button">
+            <i class="fas fa-chart-bar"></i>
+            عرض نتائج المسابقة
+        </a>
+    </div>
+</div>
+
+<style>
+    .code-competition-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .competition-header {
+        text-align: center;
+        margin-bottom: 40px;
+        padding: 30px;
+        background: linear-gradient(135deg, #2c3e50 0%, #4a569d 100%);
+        border-radius: 15px;
+        color: white;
+        box-shadow: 0 10px 30px rgba(44, 62, 80, 0.3);
+    }
+
+    .competition-header h1 {
+        font-size: 2.5em;
+        margin-bottom: 10px;
+    }
+
+    .competition-description {
+        font-size: 1.1em;
+        line-height: 1.6;
+    }
+
+    .error-message {
+        background: #e74c3c;
+        color: white;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .info-message {
+        text-align: center;
+        color: #4a569d;
+        font-size: 1.1em;
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+
+    .welcome-message {
+        text-align: center;
+        color: #4a569d;
+        font-size: 1.2em;
+        margin-bottom: 20px;
+        font-weight: 600;
+        background: #e8f4fd;
+        padding: 15px;
+        border-radius: 8px;
+    }
+
+    .voter-info-card {
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+
+    .voter-info-card h3 {
+        color: #4a569d;
+        margin-bottom: 20px;
+        font-size: 1.5em;
+        text-align: center;
+        position: relative;
+        padding-bottom: 10px;
+    }
+
+    .voter-info-card h3::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 3px;
+        background: linear-gradient(90deg, #f39c12, #e74c3c);
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: 600;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: all 0.3s;
+    }
+
+    .form-group input:focus {
+        outline: none;
+        border-color: #4a569d;
+        box-shadow: 0 0 0 3px rgba(74,86,157,0.1);
+    }
+
+    .continue-button {
+        width: 100%;
+        background: linear-gradient(135deg, #f39c12, #e74c3c);
+        color: white;
+        border: none;
+        padding: 15px;
+        border-radius: 8px;
+        font-size: 1.1em;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-weight: 600;
+        margin-top: 10px;
+    }
+
+    .continue-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 20px rgba(243,156,18,0.4);
+    }
+
+    .contestants-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 30px;
+        margin: 30px 0;
+    }
+
+    .contestant-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        border-radius: 20px;
+        padding: 25px;
+        transition: all 0.4s;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(74,86,157,0.1);
+    }
+
+    .contestant-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: linear-gradient(90deg, #4a569d, #2c3e50);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.4s;
+    }
+
+    .contestant-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 35px rgba(74,86,157,0.2);
+    }
+
+    .contestant-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .contestant-card.selected {
+        background: linear-gradient(135deg, #e8f4fd 0%, #d1e7ff 100%);
+        box-shadow: 0 15px 35px rgba(74,86,157,0.3);
+        border: 1px solid rgba(74,86,157,0.3);
+    }
+
+    .avatar-circle {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, #4a569d, #2c3e50);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        color: white;
+        box-shadow: 0 5px 15px rgba(74,86,157,0.3);
+    }
+
+    .contestant-info h3 {
+        color: #2c3e50;
+        font-weight: 700;
+    }
+
+    .poem-preview {
+        background: white;
+        padding: 20px;
+        border-radius: 15px;
+        margin-bottom: 15px;
+        border-right: 4px solid #4a569d;
+    }
+
+    .tech-stack {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin: 10px 0;
+    }
+
+    .tech-badge {
+        background: #e9ecef;
+        color: #2c3e50;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.8em;
+        font-weight: 600;
+    }
+
+    .code-preview {
+        background: #2c3e50;
+        color: #ecf0f1;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        font-family: monospace;
+        overflow-x: auto;
+    }
+
+    .code-preview pre {
+        margin: 0;
+        color: #ecf0f1;
+    }
+
+    .vote-button {
+        background: linear-gradient(135deg, #f39c12, #e74c3c);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 10px;
+        font-size: 1em;
+        cursor: pointer;
+        transition: all 0.3s;
+        width: 100%;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .vote-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 20px rgba(243,156,18,0.4);
+    }
+
+    .submit-section {
+        text-align: center;
+        margin-top: 30px;
+        padding: 25px;
+        background: linear-gradient(135deg, #e8f4fd, #d1e7ff);
+        border-radius: 15px;
+        border: 1px solid rgba(74,86,157,0.2);
+    }
+
+    .submit-vote-button {
+        background: linear-gradient(135deg, #4a569d, #2c3e50);
+        color: white;
+        border: none;
+        padding: 15px 40px;
+        border-radius: 10px;
+        font-size: 1.2em;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin: 0 auto;
+    }
+
+    .submit-vote-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 20px rgba(74,86,157,0.4);
+    }
+
+    .results-link {
+        text-align: center;
+        margin-top: 30px;
+    }
+
+    .view-results-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: linear-gradient(135deg, #4a569d, #2c3e50);
+        color: white;
+        padding: 15px 30px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1.1em;
+        transition: all 0.3s;
+    }
+
+    .view-results-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 20px rgba(74,86,157,0.4);
+        color: white;
+    }
+</style>
+
+<script>
+    let selectedContestantId = null;
+
+    function selectContestant(contestantId) {
+        document.querySelectorAll('.contestant-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+
+        event.target.closest('.contestant-card').classList.add('selected');
+        document.getElementById('contestant_id').value = contestantId;
+        selectedContestantId = contestantId;
+        document.getElementById('submitSection').style.display = 'block';
+        document.getElementById('submitSection').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    const votingForm = document.getElementById('votingForm');
+    if (votingForm) {
+        votingForm.addEventListener('submit', function(e) {
+            if (!selectedContestantId) {
+                e.preventDefault();
+                alert('الرجاء اختيار فريق قبل التصويت');
+            }
+        });
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="team-detail-container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+    
+    <div style="margin-bottom: 20px;">
+        <a href="{{ url_for('members.teams_list') }}" style="color: #4a569d; text-decoration: none; font-size: 1.1em;">
+            <i class="fas fa-arrow-right"></i> العودة للقائمة
+        </a>
+    </div>
+    
+    {% set team = team_data.team %}
+    {% set members = team_data.members %}
+    
+    <div style="background: linear-gradient(135deg, #4a569d, #2c3e50); border-radius: 20px; padding: 40px; color: white; margin-bottom: 30px; position: relative; overflow: hidden;">
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('data:image/svg+xml,...') no-repeat; opacity: 0.1;"></div>
+        
+        <div style="display: flex; align-items: center; gap: 30px; flex-wrap: wrap; position: relative; z-index: 1;">
+            <div style="width: 120px; height: 120px; background: #f39c12; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-trophy fa-4x" style="color: white;"></i>
+            </div>
+            
+            <div style="flex: 1;">
+                <h1 style="font-size: 2.5em; margin: 0 0 5px;">{{ team.team_name }}</h1>
+                <h2 style="font-size: 1.3em; margin: 0 0 15px; opacity: 0.9;">{{ team.project_title }}</h2>
+                <p style="margin: 0; opacity: 0.9;"><i class="fas fa-crown"></i> قائد الفريق: {{ team.leader_first_name }} {{ team.leader_last_name }}</p>
+            </div>
+            
+            <div style="text-align: center; background: rgba(255,255,255,0.2); padding: 20px; border-radius: 15px;">
+                <span style="display: block; font-size: 2.5em; font-weight: bold;">{{ team.total_points }}</span>
+                <span style="font-size: 0.9em;">إجمالي النقاط</span>
+            </div>
+        </div>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
+        <div>
+            <div style="background: white; border-radius: 15px; padding: 30px; margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
+                <h3 style="color: #4a569d; margin-bottom: 20px; font-size: 1.5em;">عن الفريق</h3>
+                <p style="color: #666; line-height: 1.8;">{{ team.description or 'لم يضف وصفاً بعد' }}</p>
+            </div>
+            
+            <div style="background: white; border-radius: 15px; padding: 30px; margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
+                <h3 style="color: #4a569d; margin-bottom: 20px; font-size: 1.5em;">التقنيات المستخدمة</h3>
+                {% if team.technologies %}
+                <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                    {% for tech in team.technologies.split(',') %}
+                    <span style="background: #e9ecef; color: #2c3e50; padding: 8px 15px; border-radius: 50px; font-size: 0.9em;">{{ tech.strip() }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p style="color: #666;">لم يحدد الفريق التقنيات المستخدمة بعد</p>
+                {% endif %}
+            </div>
+            
+            <div style="background: white; border-radius: 15px; padding: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
+                <h3 style="color: #4a569d; margin-bottom: 20px; font-size: 1.5em;">آخر المشاركات</h3>
+                {% if team_data.attempts %}
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    {% for attempt in team_data.attempts %}
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                        <div>
+                            <span style="font-weight: 600;">{{ attempt.first_name }} {{ attempt.last_name }}</span>
+                            <span style="color: #666; margin-right: 10px; font-size: 0.9em;">{{ attempt.timestamp[:10] }}</span>
+                        </div>
+                        <div>
+                            <span style="background: #4a569d; color: white; padding: 5px 10px; border-radius: 20px;">{{ attempt.score }}/{{ attempt.total_questions }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p style="color: #666;">لم يشارك الفريق في أي تحديات بعد</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div>
+            <div style="background: white; border-radius: 15px; padding: 30px; margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
+                <h3 style="color: #4a569d; margin-bottom: 20px; font-size: 1.5em;">أعضاء الفريق</h3>
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    {% for member in members %}
+                    <div style="display: flex; align-items: center; gap: 15px; padding: 10px; background: #f8f9fa; border-radius: 10px;">
+                        <div style="width: 40px; height: 40px; background: #4a569d; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <span style="font-weight: 600;">{{ member.first_name }} {{ member.last_name }}</span>
+                            {% if loop.first %}
+                            <span style="display: inline-block; margin-right: 10px; background: #f39c12; color: white; padding: 2px 8px; border-radius: 20px; font-size: 0.8em;">قائد</span>
+                            {% endif %}
+                        </div>
+                        <span style="color: #4a569d; font-weight: 600;">{{ member.score }}</span>
+                    </div>
+                    {% else %}
+                    <p style="color: #666;">لا يوجد أعضاء في الفريق</p>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div style="background: white; border-radius: 15px; padding: 30px; margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
+                <h3 style="color: #4a569d; margin-bottom: 20px; font-size: 1.5em;">إحصائيات سريعة</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                        <span style="display: block; font-size: 1.8em; font-weight: bold; color: #4a569d;">{{ members|length }}</span>
+                        <span style="color: #666;">أعضاء</span>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                        <span style="display: block; font-size: 1.8em; font-weight: bold; color: #4a569d;">{{ team.total_points }}</span>
+                        <span style="color: #666;">نقاط</span>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                        <span style="display: block; font-size: 1.8em; font-weight: bold; color: #4a569d;">{{ team_data.attempts|length }}</span>
+                        <span style="color: #666;">تحديات</span>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                        <span style="display: block; font-size: 1.8em; font-weight: bold; color: #4a569d;">{{ team.created_at[:10] }}</span>
+                        <span style="color: #666;">تاريخ الإنشاء</span>
+                    </div>
+                </div>
+            </div>
+            
+            {% if session.first_name and not session.team_id %}
+            <form method="POST" action="{{ url_for('members.join_team', team_id=team.id) }}">
+                <button type="submit" style="width: 100%; background: #27ae60; color: white; border: none; padding: 20px; border-radius: 15px; font-size: 1.2em; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                    <i class="fas fa-user-plus"></i> انضم لهذا الفريق
+                </button>
+            </form>
+            {% elif session.team_id == team.id %}
+            <div style="background: #d4edda; color: #155724; padding: 20px; border-radius: 15px; text-align: center;">
+                <i class="fas fa-check-circle fa-2x" style="margin-bottom: 10px;"></i>
+                <p style="font-weight: 600;">أنت عضو في هذا الفريق</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

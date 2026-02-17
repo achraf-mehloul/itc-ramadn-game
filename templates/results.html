@@ -1,0 +1,369 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="results-section">
+    <div class="container">
+        <div class="results-header">
+            <h1>🌙 نتيجة التحدي</h1>
+            <p class="participant-name">{{ first_name }} {{ last_name }}</p>
+            {% if student_stats and student_stats.team_name %}
+            <p class="team-name">فريق: {{ student_stats.team_name }}</p>
+            {% endif %}
+        </div>
+        
+        <div class="results-summary">
+            <div class="score-card">
+                <div class="score-circle" style="--score-percentage: {{ (score/total*100) }}%;">
+                    <span class="score-number">{{ score }}/{{ total }}</span>
+                    <span class="score-percentage">{{ (score/total*100)|round|int }}%</span>
+                </div>
+            </div>
+            
+            <div class="score-message">
+                {% set percentage = (score/total*100)|round|int %}
+                {% if percentage >= 90 %}
+                <h3>🏆 مبروك! أنت محترف</h3>
+                <p>أداء ممتاز! أنت من أفضل المبرمجين في المسابقة</p>
+                {% elif percentage >= 75 %}
+                <h3>✨ أداء رائع</h3>
+                <p>نتيجة ممتازة! واصل التحدي لتصبح محترفاً</p>
+                {% elif percentage >= 60 %}
+                <h3>👏 عمل جيد</h3>
+                <p>أداء جيد. حاول مرة أخرى لتحسين ترتيبك</p>
+                {% else %}
+                <h3>💪 لا تستسلم</h3>
+                <p>كلما تدربت أكثر، كلما أصبحت أفضل. حاول مجدداً!</p>
+                {% endif %}
+                
+                {% if student_rank %}
+                <div class="rank-info">
+                    <p>ترتيبك: <strong>#{{ student_rank }}</strong> من {{ total_students }} مشارك</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="leaderboard-preview">
+            <h2>🏅 أفضل 10 متصدرين</h2>
+            <div class="mini-leaderboard">
+                {% for student in leaderboard %}
+                <div class="mini-leaderboard-item {% if student.first_name == first_name and student.last_name == last_name %}current-user{% endif %}">
+                    <span class="mini-rank">#{{ loop.index }}</span>
+                    <span class="mini-name">{{ student.first_name }} {{ student.last_name }}</span>
+                    <span class="mini-score">{{ student.score }}/{{ student.total_questions }}</span>
+                    <span class="mini-percentage">{{ student.percentage|round|int }}%</span>
+                </div>
+                {% endfor %}
+            </div>
+            <a href="{{ url_for('quiz.leaderboard') }}" class="view-full-leaderboard">عرض كل المتصدرين</a>
+        </div>
+        
+        <div class="answers-review">
+            <h2>📝 مراجعة إجاباتك</h2>
+            {% for answer in answers %}
+            <div class="answer-item {% if answer.is_correct %}correct{% else %}incorrect{% endif %}">
+                <h4>سؤال {{ loop.index }}: {{ answer.question }}</h4>
+                <p>إجابتك: <strong>{{ answer.user_answer }}</strong></p>
+                {% if not answer.is_correct %}
+                <p class="correct-answer">الإجابة الصحيحة: {{ answer.correct_answer }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="results-actions">
+            <a href="{{ url_for('quiz.restart') }}" class="retry-btn">
+                <i class="fas fa-redo-alt"></i> حاول مجدداً
+            </a>
+            <a href="{{ url_for('quiz.leaderboard') }}" class="leaderboard-btn">
+                <i class="fas fa-trophy"></i> المتصدرين
+            </a>
+            <a href="{{ url_for('quiz.index') }}" class="home-btn">
+                <i class="fas fa-home"></i> الرئيسية
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+.results-section {
+    padding: 40px 0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    min-height: 100vh;
+}
+
+.results-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.results-header h1 {
+    color: #4a569d;
+    font-size: 2.5em;
+    margin-bottom: 10px;
+}
+
+.participant-name {
+    font-size: 1.5em;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.team-name {
+    color: #f39c12;
+    font-size: 1.2em;
+    font-weight: 600;
+}
+
+.results-summary {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 40px;
+    align-items: center;
+}
+
+.score-card {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.score-circle {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto;
+    background: conic-gradient(#4a569d calc(var(--score-percentage) * 1%), #f0f0f0 0);
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.score-circle::before {
+    content: '';
+    position: absolute;
+    width: 160px;
+    height: 160px;
+    background: white;
+    border-radius: 50%;
+}
+
+.score-number,
+.score-percentage {
+    position: relative;
+    z-index: 1;
+}
+
+.score-number {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.score-percentage {
+    font-size: 1.2em;
+    color: #666;
+}
+
+.score-message {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.score-message h3 {
+    color: #4a569d;
+    margin-bottom: 10px;
+    font-size: 1.5em;
+}
+
+.score-message p {
+    color: #666;
+    line-height: 1.6;
+}
+
+.rank-info {
+    margin-top: 15px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.rank-info strong {
+    color: #f39c12;
+    font-size: 1.2em;
+}
+
+.leaderboard-preview {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    margin-bottom: 40px;
+}
+
+.leaderboard-preview h2 {
+    color: #4a569d;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.mini-leaderboard-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    gap: 15px;
+}
+
+.mini-leaderboard-item.current-user {
+    background: #e8f4fd;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.mini-rank {
+    width: 40px;
+    font-weight: bold;
+    color: #4a569d;
+}
+
+.mini-name {
+    flex: 1;
+}
+
+.mini-score {
+    width: 60px;
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+.mini-percentage {
+    width: 60px;
+    color: #f39c12;
+    font-weight: 600;
+}
+
+.view-full-leaderboard {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #4a569d, #2c3e50);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.view-full-leaderboard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(74,86,157,0.3);
+}
+
+.answers-review {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    margin-bottom: 40px;
+}
+
+.answers-review h2 {
+    color: #4a569d;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.answer-item {
+    padding: 20px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    border-right: 4px solid;
+}
+
+.answer-item.correct {
+    background: #d4edda;
+    border-right-color: #28a745;
+}
+
+.answer-item.incorrect {
+    background: #f8d7da;
+    border-right-color: #dc3545;
+}
+
+.answer-item h4 {
+    margin-bottom: 10px;
+    color: #2c3e50;
+}
+
+.correct-answer {
+    color: #28a745;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+.results-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.retry-btn,
+.leaderboard-btn,
+.home-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 15px 30px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.retry-btn {
+    background: linear-gradient(135deg, #f39c12, #e74c3c);
+    color: white;
+}
+
+.leaderboard-btn {
+    background: linear-gradient(135deg, #4a569d, #2c3e50);
+    color: white;
+}
+
+.home-btn {
+    background: linear-gradient(135deg, #6c757d, #495057);
+    color: white;
+}
+
+.retry-btn:hover,
+.leaderboard-btn:hover,
+.home-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+}
+
+@media (max-width: 768px) {
+    .results-summary {
+        grid-template-columns: 1fr;
+    }
+    
+    .score-circle {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .score-number {
+        font-size: 1.8em;
+    }
+}
+</style>
+{% endblock %}

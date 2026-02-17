@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="quiz-start-section" style="background: linear-gradient(135deg, #2c3e50 0%, #4a569d 100%); min-height: 100vh; padding: 40px 0;">
+    <div class="container">
+        <div class="quiz-header" style="text-align: center; color: white; margin-bottom: 40px;">
+            <h1 style="font-size: 2.5em; margin-bottom: 10px;">🌙 تحدّى نفسك برمجياً</h1>
+            <p style="font-size: 1.2em; opacity: 0.9;">أجب على الأسئلة البرمجية واربح النقاط</p>
+        </div>
+        
+        <div class="quiz-form-container" style="max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.2);">
+            <form method="POST" class="quiz-form">
+                <div class="form-group" style="margin-bottom: 25px;">
+                    <label style="display: block; margin-bottom: 8px; color: #4a569d; font-weight: 600;">الاسم الأول:</label>
+                    <input type="text" name="first_name" placeholder="مثال: إسمك" required
+                           style="width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 10px;">
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 25px;">
+                    <label style="display: block; margin-bottom: 8px; color: #4a569d; font-weight: 600;">اسم العائلة:</label>
+                    <input type="text" name="last_name" placeholder="مثال: لقبك" required
+                           style="width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 10px;">
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 25px;">
+                    <label style="display: block; margin-bottom: 8px; color: #4a569d; font-weight: 600;">انضم لفريق (اختياري):</label>
+                    <select name="team_id" style="width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 10px;">
+                        <option value="">-- بدون فريق --</option>
+                        {% for team in teams %}
+                        <option value="{{ team.id }}">{{ team.team_name }} ({{ team.total_points }} نقطة)</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="quiz-info" style="background: #f8f9fa; padding: 25px; border-radius: 15px; margin: 30px 0; border-right: 4px solid #f39c12;">
+                    <h3 style="color: #4a569d; margin-bottom: 15px;">📌 معلومات التحدي:</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="padding: 8px 0; color: #555;">⏱️ كل سؤال له وقت محدد للإجابة</li>
+                        <li style="padding: 8px 0; color: #555;">⚡ كلما أسرعت بالإجابة تحصل على نقاط إضافية</li>
+                        <li style="padding: 8px 0; color: #555;">🏆 النقاط تحدد ترتيبك في لوحة المتصدرين</li>
+                        <li style="padding: 8px 0; color: #555;">👥 إذا انضممت لفريق، ستضاف نقاطك للفريق</li>
+                    </ul>
+                </div>
+                
+                <button type="submit" 
+                        style="width: 100%; background: linear-gradient(135deg, #f39c12, #e74c3c); color: white; border: none; padding: 18px; border-radius: 12px; font-size: 1.2em; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                    ابدأ التحدي
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
