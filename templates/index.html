@@ -4,11 +4,10 @@
 <div class="hero-section" style="background: linear-gradient(135deg, #2c3e50 0%, #4a569d 100%);">
     <div class="container">
         <div class="hero-content">
-            <h1>🌙 مسابقة رمضان البرمجية 2026</h1>
-            <h2>رمضان فرصة للتحدي والإبداع</h2>
+            <h1>ITC Ramadan</h1>
+            <h2>تحدي رمضان</h2>
             <p class="hero-description">
-                شارك في أكبر مسابقة برمجية عربية خلال شهر رمضان المبارك<br>
-                تحدى نفسك، تعلم مهارات جديدة، واربح جوائز قيمة
+                                    شارك في مسابقة رمضان تحت تنضيم Itc</br>
             </p>
             <a href="{{ url_for('quiz.quiz') }}" class="cta-button">ابدأ التحدي الآن</a>
         </div>
@@ -31,7 +30,7 @@
             <div class="info-card">
                 <div class="card-icon">🏆</div>
                 <h3>جوائز قيمة</h3>
-                <p>جوائز لأفضل المبرمجين في نهاية الشهر + جوائز يومية للمتميزين</p>
+                <p>جوائز لأفضل المبرمجين في نهاية الشهر</p>
             </div>
             
             <div class="info-card">
@@ -48,26 +47,26 @@
         </div>
 
         <div class="stats-section">
-            <h2>إحصائيات المسابقة</h2>
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <span class="stat-number">1000+</span>
-                    <span class="stat-label">مشارك</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">30</span>
-                    <span class="stat-label">تحدي يومي</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">50+</span>
-                    <span class="stat-label">فريق</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">10</span>
-                    <span class="stat-label">جوائز</span>
-                </div>
-            </div>
+    <h2>إحصائيات المسابقة</h2>
+    <div class="stats-grid">
+        <div class="stat-item">
+            <span class="stat-number">{{ stats.students_count }}+</span>
+            <span class="stat-label">مشارك</span>
         </div>
+        <div class="stat-item">
+            <span class="stat-number">{{ stats.daily_challenges }}</span>
+            <span class="stat-label">تحدي يومي</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number">{{ stats.teams_count }}+</span>
+            <span class="stat-label">فريق</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number">{{ stats.prizes }}</span>
+            <span class="stat-label">جوائز</span>
+        </div>
+    </div>
+</div>
 
         <div class="how-to-participate">
             <h2>📋 كيفية المشاركة</h2>
