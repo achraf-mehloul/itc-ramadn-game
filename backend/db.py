@@ -1,19 +1,16 @@
 import os
-import psycopg2
-from psycopg2.extras import RealDictCursor
 from contextlib import contextmanager
-from flask import current_app, g
-import sqlite3  
+from flask import current_app
+import psycopg
+from psycopg.rows import dict_row
+import sqlite3
 
 def get_db_connection():
-    """Get database connection based on environment"""
     if os.environ.get('RENDER') or os.environ.get('DATABASE_URL'):
         database_url = os.environ.get('DATABASE_URL')
         if not database_url:
             database_url = "postgresql://ramadan_qst_sl_user:yGnEizXLCsO47ecfU5TzPNQfLYBBUszV@dpg-d69t6bk9c44c738gpj1g-a.oregon-postgres.render.com/ramadan_qst_sl"
-        
-        conn = psycopg2.connect(database_url)
-        conn.autocommit = False
+        conn = psycopg.connect(database_url, row_factory=dict_row)
         return conn, 'postgresql'
     else:
         conn = sqlite3.connect(current_app.config['DATABASE'])
@@ -22,7 +19,6 @@ def get_db_connection():
 
 @contextmanager
 def get_db():
-    """Get database connection with context"""
     conn, db_type = get_db_connection()
     try:
         yield conn
@@ -30,15 +26,11 @@ def get_db():
         conn.close()
 
 def init_db():
-    """Initialize database tables"""
     db_path = current_app.config['DATABASE']
-    
     try:
         conn, db_type = get_db_connection()
         cursor = conn.cursor()
-        
         if db_type == 'postgresql':
-            
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS students (
                     id SERIAL PRIMARY KEY,
@@ -51,7 +43,6 @@ def init_db():
                     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             ''')
-            
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS teams (
                     id SERIAL PRIMARY KEY,
@@ -66,7 +57,6 @@ def init_db():
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             ''')
-            
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS quiz_attempts (
                     id SERIAL PRIMARY KEY,
@@ -77,7 +67,6 @@ def init_db():
                     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             ''')
-            
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS poetry_votes (
                     id SERIAL PRIMARY KEY,
@@ -88,7 +77,6 @@ def init_db():
                     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             ''')
-            
         else:
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS students (
@@ -102,7 +90,6 @@ def init_db():
                     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
                 )
             ''')
-            
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS teams (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -117,7 +104,6 @@ def init_db():
                     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
                 )
             ''')
-            
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS quiz_attempts (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -130,7 +116,6 @@ def init_db():
                     FOREIGN KEY (team_id) REFERENCES teams (id)
                 )
             ''')
-            
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS poetry_votes (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -142,12 +127,10 @@ def init_db():
                     FOREIGN KEY (team_id) REFERENCES teams (id)
                 )
             ''')
-        
         conn.commit()
         conn.close()
-        print(f"✅ Database initialized successfully!")
-        
+        print(f"Database initialized successfully!")
     except Exception as e:
-        print(f"❌ Error initializing database: {e}")
+        print(f"Error initializing database: {e}")
         if 'conn' in locals():
             conn.close()
