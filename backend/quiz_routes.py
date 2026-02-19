@@ -1,18 +1,24 @@
 from flask import Blueprint, render_template, request, session, redirect, url_for
 from backend.data import QUESTIONS
-from backend.models import save_student_result, get_student_rank, get_student_stats, get_leaderboard, get_all_teams
+from backend.models import save_student_result, get_student_rank, get_student_stats, get_leaderboard, get_all_teams, get_competition_stats
 from backend.utils import get_rank_info
 
 quiz_bp = Blueprint('quiz', __name__)
 
 @quiz_bp.route('/')
 def index():
+    """الصفحة الرئيسية"""
     top_students = get_leaderboard(5)
     teams_count = len(get_all_teams())
-    return render_template('index.html', top_students=top_students, teams_count=teams_count)
+    stats = get_competition_stats() 
+    return render_template('index.html', 
+                         top_students=top_students, 
+                         teams_count=teams_count,
+                         stats=stats)  
 
 @quiz_bp.route('/quiz', methods=['GET', 'POST'])
 def quiz():
+    """صفحة بدء الاختبار"""
     if request.method == 'POST':
         session['first_name'] = request.form['first_name'].strip().title()
         session['last_name'] = request.form['last_name'].strip().title()
@@ -34,6 +40,7 @@ def quiz():
 
 @quiz_bp.route('/question', methods=['GET', 'POST'])
 def question():
+    """صفحة عرض الأسئلة"""
     if 'first_name' not in session:
         return redirect(url_for('quiz.quiz'))
     
@@ -75,6 +82,7 @@ def question():
 
 @quiz_bp.route('/results')
 def results():
+    """صفحة عرض النتائج"""
     if 'first_name' not in session:
         return redirect(url_for('quiz.quiz'))
     
@@ -99,6 +107,7 @@ def results():
 
 @quiz_bp.route('/leaderboard')
 def leaderboard():
+    """صفحة عرض المتصدرين"""
     search = request.args.get('search', '').strip()
     page = int(request.args.get('page', 1))
     per_page = 20
@@ -128,5 +137,6 @@ def leaderboard():
 
 @quiz_bp.route('/restart')
 def restart():
+    """إعادة تشغيل الاختبار (مسح الجلسة)"""
     session.clear()
     return redirect(url_for('quiz.quiz'))
